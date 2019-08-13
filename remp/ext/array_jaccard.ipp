@@ -1,4 +1,6 @@
-template<class tokenizer>
+#include <set>
+
+template<class tokenizer, class container_type=std::set<typename tokenizer::token_type> >
 np::ndarray array_jaccard(np::ndarray X, np::ndarray Y) {
   if (X.get_nd() != 1 || Y.get_nd() != 1) {
     throw std::runtime_error("X and Y should be 1-dimentional array");
@@ -13,7 +15,7 @@ np::ndarray array_jaccard(np::ndarray X, np::ndarray Y) {
 
   //using tokenizer = tokenizer::QgramTokenizer<wchar_t, qval>;
 
-  std::vector< std::set < typename tokenizer::token_type > > _X(N), _Y(N);
+  std::vector< container_type > _X(N), _Y(N);
 
     wchar_t buf[1024];
 //  #pragma omp parallel for

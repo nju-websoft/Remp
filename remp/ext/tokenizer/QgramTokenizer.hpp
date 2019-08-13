@@ -12,7 +12,8 @@ namespace tokenizer {
   class QgramTokenizer {
   public:
     using token_type = typename std::array<wchar_t, qval>;
-    static bool tokenize(char_type * begin, std::set< token_type > & grams) {
+    template<class container_type>
+    static bool tokenize(char_type * begin, container_type & grams) {
       token_type gram;
       std::array<char_type, 2 * qval - 2> buf;
       buf.fill(0);
@@ -62,7 +63,8 @@ namespace tokenizer {
   public:
     using token_type = typename std::pair<wchar_t, wchar_t>;
 
-    static bool tokenize(char_type * c, std::set< token_type > & grams) {
+    template<class container_type>
+    static bool tokenize(char_type * c, container_type & grams) {
       if (c[0] != 0) {
         grams.insert(std::make_pair(0, c[0]));
         for (; *c != 0; ++c) {
