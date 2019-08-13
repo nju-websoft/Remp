@@ -35,7 +35,7 @@ setup(
             sources=['remp/ext/string_matching.cpp', 'remp/ext/array_bigram_jaccard.cpp'],
             extra_compile_args=['-fopenmp', '-Wno-sign-compare'],
             extra_link_args=['-fopenmp'],
-            libraries=['boost_python', 'boost_numpy%d%d' % (version_info.major, version_info.micro)]
+            libraries=['boost_python', 'boost_numpy%d%d' % (version_info.major, version_info.minor)]
         )
     ],
 
