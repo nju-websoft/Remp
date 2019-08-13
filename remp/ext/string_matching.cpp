@@ -3,6 +3,9 @@
 #include "tokenizer/WhitespaceTokenizer.hpp"
 #include "similarity_measure/jaccard.hpp"
 
+#include <iostream>
+#include <omp.h>
+
 namespace p = boost::python;
 namespace np = boost::python::numpy;
 
@@ -14,6 +17,9 @@ BOOST_PYTHON_MODULE(string_matching)
 {
   Py_Initialize();
   np::initialize();
+
+
+
   p::def("array_bigram_jaccard", array_bigram_jaccard);
   p::def("array_whitespace_jaccard", array_jaccard< tokenizer::WhitespaceTokenizer<wchar_t> >);
   p::def("array_qgram_jaccard_2", array_jaccard< tokenizer::QgramTokenizer<wchar_t, 2> >);

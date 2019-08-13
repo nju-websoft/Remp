@@ -32,6 +32,24 @@ namespace tokenizer {
       return true;
     }
 
+    template<class container_type>
+    static bool tokenize(const char * c, container_type & grams) {
+      for (auto i = c; *i != 0; ++i) {
+        if (is_whitespace(*i)) {
+          auto s = i;
+          while (*i != 0 && !is_whitespace(*i)) ++i;
+          typename container_type::value_type part;
+          part.reserve(i - s);
+          for (int j = 0; j < i - s; j++) {
+            part.push_back(*(i + j));
+          }
+          grams.insert(part);
+        }
+      }
+
+      return true;
+    }
+
   };
 }
 
