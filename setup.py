@@ -3,8 +3,8 @@ import os
 import re
 
 from sys import version_info
-from setuptools import find_packages
-from setuptools import setup
+from sysconfig import get_paths
+from setuptools import find_packages, setup
 from distutils.core import Extension
 
 
@@ -33,7 +33,8 @@ setup(
         Extension(
             'remp.string_matching',
             sources=['remp/ext/string_matching.cpp', 'remp/ext/array_bigram_jaccard.cpp'],
-            extra_compile_args=['-fopenmp', '-Wno-sign-compare'],
+            include_dirs = [get_paths()['include'] + '/../'],
+            extra_compile_args=['-fopenmp', '-Wno-sign-compare', '-std=c++11'],
             extra_link_args=['-fopenmp'],
             libraries=['boost_python', 'boost_numpy%d%d' % (version_info.major, version_info.minor)]
         )
