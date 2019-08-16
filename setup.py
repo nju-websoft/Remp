@@ -32,7 +32,7 @@ setup(
     ext_modules=[
         Extension(
             'remp.string_matching',
-            sources=['remp/ext/string_matching.cpp', 'remp/ext/array_bigram_jaccard.cpp'],
+            sources=['remp/ext/string_matching.cpp'],
             include_dirs = [get_paths()['include'] + '/../'],
             extra_compile_args=['-fopenmp', '-Wno-sign-compare', '-std=c++11'],
             extra_link_args=['-fopenmp'],
@@ -48,8 +48,6 @@ setup(
         'Development Status :: 2 - Pre-Alpha',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',

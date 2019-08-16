@@ -15,41 +15,22 @@ namespace tokenizer {
   }
 
   template<typename char_type>
-  class WhitespaceTokenizer {
-  public:
+  struct WhitespaceTokenizer {
     using token_type = typename std::basic_string<char_type>;
 
-    template<class container_type>
-    static bool tokenize(char_type * c, container_type & grams) {
+    template<class input_type, class container_type>
+    inline bool operator()(input_type * c, container_type & grams) const {
+      using container_token_type = typename container_type::value_type;
       for (auto i = c; *i != 0; ++i) {
         if (!is_whitespace(*i)) {
           auto s = i;
           while (*i != 0 && !is_whitespace(*i)) ++i;
-          grams.insert(token_type{s, i - s});
+          grams.insert(container_token_type{s, i});
         }
       }
 
       return true;
     }
-
-    template<class container_type>
-    static bool tokenize(const char * c, container_type & grams) {
-      for (auto i = c; *i != 0; ++i) {
-        if (!is_whitespace(*i)) {
-          auto s = i;
-          while (*i != 0 && !is_whitespace(*i)) ++i;
-          typename container_type::value_type part;
-          part.reserve(i - s);
-          for (int j = 0; j < i - s; j++) {
-            part.push_back(*(i + j));
-          }
-          grams.insert(part);
-        }
-      }
-
-      return true;
-    }
-
   };
 }
 
