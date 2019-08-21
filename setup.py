@@ -6,6 +6,7 @@ from sys import version_info
 from sysconfig import get_paths
 from setuptools import find_packages, setup
 from distutils.core import Extension
+from Cython.Build import cythonize
 
 
 def read(filename):
@@ -29,7 +30,7 @@ setup(
 
     packages=find_packages(exclude=('tests',)),
 
-    ext_modules=[
+    ext_modules=cythonize([
         Extension(
             'remp.string_matching',
             sources=['remp/ext/string_matching.cpp'],
@@ -37,8 +38,10 @@ setup(
             extra_compile_args=['-fopenmp', '-Wno-sign-compare', '-std=c++11'],
             extra_link_args=['-fopenmp'],
             libraries=['boost_python', 'boost_numpy%d%d' % (version_info.major, version_info.minor)]
-        )
-    ],
+        ),
+        Extension('remp.ssj.jaccard_join_cy', ['remp/ssj/jaccard_join_cy.pyx'], language='c++'),
+        Extension('remp.ssj.set_sim_join_cy', ['remp/ssj/set_sim_join_cy.pyx'], language='c++'),
+    ]),
 
     install_requires=[
         'rdflib', 'lxml', 'networkx', 'unidecode', 'numpy', 'pandas', 'scipy', 'py_stringmatching', 'py_stringsimjoin'

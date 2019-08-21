@@ -14,9 +14,47 @@ from libcpp.pair cimport pair
 from pickle import dump
 from os import getpid
 
-from ssj.index.position_index_cy cimport PositionIndexCy
-from ssj.utils.cython_utils cimport compfnptr,\
-    get_comparison_function, get_comp_type, int_max, int_min, tokenize_lists
+
+ctypedef bool (*compfnptr)(double, double) nogil
+
+
+cdef class InvertedIndexCy:
+    cdef omap[int, vector[int]] index
+    cdef vector[int] size_vector
+
+    cdef void set_fields(self, omap[int, vector[int]]& ind, vector[int]& sv):
+        self.index = ind
+        self.size_vector = sv
+
+    cdef void build_prefix_index(self, vector[vector[int]]& token_vectors, int qval, double threshold):
+        cdef int ii, jj, m, n, prefix_length
+        cdef vector[int] tokens
+
+        n = token_vectors.size()
+        for ii in range(n):
+            tokens = token_vectors[ii]
+            m = tokens.size()
+            self.size_vector.push_back(m)
+            prefix_length = min(int(qval * threshold + 1), m)
+
+            for jj in range(prefix_length):
+                self.index[tokens[jj]].push_back(ii)
+
+
+cdef class PositionIndexCy:
+    cdef omap[int, vector[pair[int, int]]] index
+    cdef int min_len, max_len
+    cdef vector[int] size_vector, l_empty_ids
+    cdef double threshold
+
+    cdef void set_fields(self, omap[int, vector[pair[int, int]]]& ind, vector[int]& sv,
+                         vector[int]& emp_ids, int min_l, int max_l, double t):
+        self.index = ind
+        self.size_vector = sv
+        self.l_empty_ids = emp_ids
+        self.min_len = min_l
+        self.max_len = max_l
+        self.threshold = t
 
 
 cdef double jaccard(const vector[int]& tokens1, const vector[int]& tokens2) nogil:
@@ -37,6 +75,96 @@ cdef double jaccard(const vector[int]& tokens1, const vector[int]& tokens2) nogi
         else:
             j += 1
     return (overlap * 1.0) / <double>(sum_of_size - overlap)
+
+
+from remp.ssj.token_ordering import gen_token_ordering_for_tables,\
+    order_using_token_ordering
+
+
+cdef void tokenize_lists(lvalues, rvalues, tokenizer,
+                         vector[vector[int]]& ltokens,
+                         vector[vector[int]]& rtokens):
+
+    token_ordering = gen_token_ordering_for_tables(
+                         lvalues, rvalues, tokenizer)
+
+    for lstr in lvalues:
+        py_tokens = order_using_token_ordering(
+                        tokenizer.tokenize(lstr), token_ordering)
+        ltokens.push_back(py_tokens)
+
+    for rstr in rvalues:
+        py_tokens = order_using_token_ordering(
+                        tokenizer.tokenize(rstr), token_ordering)
+        rtokens.push_back(py_tokens)
+
+
+cdef void build_inverted_index(vector[vector[int]]& token_vectors,
+                               InvertedIndexCy inv_index):
+    cdef vector[int] tokens, size_vector
+    cdef int i, j, m, n=token_vectors.size()
+    cdef omap[int, vector[int]] index
+    for i in xrange(n):
+        tokens = token_vectors[i]
+        m = tokens.size()
+        size_vector.push_back(m)
+        for j in range(m):
+            index[tokens[j]].push_back(i)
+    inv_index.set_fields(index, size_vector)
+
+
+cdef int get_comp_type(comp_op):
+    if comp_op == '<':
+        return 0
+    elif comp_op == '<=':
+        return 1
+    elif comp_op == '>':
+        return 2
+    elif comp_op == '>=':
+        return 3
+    elif comp_op == '=':
+        return 4
+
+
+cdef compfnptr get_comparison_function(const int comp_type) nogil:
+    if comp_type == 0:
+        return lt_compare
+    elif comp_type == 1:
+        return le_compare
+    elif comp_type == 2:
+        return gt_compare
+    elif comp_type == 3:
+        return ge_compare
+    elif comp_type == 4:
+        return eq_compare
+
+
+cdef bool eq_compare(double val1, double val2) nogil:
+    return val1 == val2
+
+
+cdef bool le_compare(double val1, double val2) nogil:
+    return val1 <= val2
+
+
+cdef bool lt_compare(double val1, double val2) nogil:
+    return val1 < val2
+
+
+cdef bool ge_compare(double val1, double val2) nogil:
+    return val1 >= val2
+
+
+cdef bool gt_compare(double val1, double val2) nogil:
+    return val1 > val2
+
+
+cdef int int_min(int a, int b) nogil:
+    return a if a <= b else b
+
+
+cdef int int_max(int a, int b) nogil:
+    return a if a >= b else b
 
 
 def set_sim_join_cy(lvalues, rvalues, lkeys, rkeys,

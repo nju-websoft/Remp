@@ -2,9 +2,9 @@
 from joblib import delayed, Parallel
 import pandas as pd
 
-from ssj.utils.generic_helper import get_num_processes_to_launch, split_table
+from remp.ssj.generic_helper import get_num_processes_to_launch, split_table
 
-from ssj.join.set_sim_join_cy import set_sim_join_cy
+from remp.ssj.set_sim_join_cy import set_sim_join_cy
 
 
 def jaccard_join_cy(lvalues, rvalues, lkeys, rkeys,
