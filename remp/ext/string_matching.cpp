@@ -13,6 +13,12 @@ namespace np = boost::python::numpy;
 template<template<class> class Measure, template<typename> class Tokenizer>
 struct PyOjbectSimilarityFunction {
   inline float operator() (PyObject * x, PyObject * y) {
+    #ifdef _WIN32
+    typename Measure<typename Tokenizer<int>::token_type>::container_type x_tokens, y_tokens;
+    tokenizer_4(PyUnicode_4BYTE_DATA(x), x_tokens);
+    tokenizer_4(PyUnicode_4BYTE_DATA(y), y_tokens);
+    return measure_4.get_sim_score(x_tokens, y_tokens);
+    #else
     int char_width = std::max(PyUnicode_KIND(x), PyUnicode_KIND(y));
 
     if (char_width == 1) {
@@ -24,17 +30,16 @@ struct PyOjbectSimilarityFunction {
       typename Measure<typename Tokenizer<wchar_t>::token_type>::container_type x_tokens, y_tokens;
       tokenizer_2(PyUnicode_2BYTE_DATA(x), x_tokens);
       tokenizer_2(PyUnicode_2BYTE_DATA(y), y_tokens);
-      std::cout << x_tokens.size() << " " << y_tokens.size() << std::endl;
       return measure_2.get_sim_score(x_tokens, y_tokens);
     } else if (char_width == 4) {
       typename Measure<typename Tokenizer<int>::token_type>::container_type x_tokens, y_tokens;
       tokenizer_4(PyUnicode_4BYTE_DATA(x), x_tokens);
       tokenizer_4(PyUnicode_4BYTE_DATA(y), y_tokens);
-      std::cout << x_tokens.size() << " " << y_tokens.size() << std::endl;
       return measure_4.get_sim_score(x_tokens, y_tokens);
     } else {
       throw std::runtime_error("unexpected string format");
     }
+    #endif
   }
 private:
   Tokenizer<char> tokenizer_1;
@@ -66,7 +71,7 @@ np::ndarray array_similarty_function(np::ndarray X, np::ndarray Y) {
 
   PyOjbectSimilarityFunction<Measure, Tokenizer> func;
 
-  //#pragma omp parallel for
+  #pragma omp parallel for
   for (int i = 0; i < N; i++) {
     sims[i] = func(_X[i], _Y[i]);
   }

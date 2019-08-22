@@ -19,7 +19,7 @@ def read(filename):
 if os.name == 'nt':
     include_dirs = [os.path.join(get_paths()['platstdlib'], '..', 'Library', 'include')]
     library_dir = os.path.join(get_paths()['platstdlib'], '..', 'Library', 'lib')
-    libraries = [f for f in os.listdir(library_dir) if (f.startswith('boost')) and ('numpy' in f or 'python' in f)]
+    libraries = [os.path.join(library_dir, f.replace('.lib', '')) for f in os.listdir(library_dir) if (f.startswith('boost')) and ('numpy' in f or 'python' in f)]
     extra_compile_args = ['/openmp', '/DBOOST_ALL_NO_LIB']
 else:
     include_dirs = [get_paths()['include'] + '/../']
