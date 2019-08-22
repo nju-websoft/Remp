@@ -12,34 +12,11 @@ def similarity_func_default(tu):
     return jaccard.get_sim_score(bigram.tokenize(tu.v1), bigram.tokenize(tu.v2))
 
 
-def attirubte_similarity(attributes_1, attributes_2, prior_alignment, similarity_func=None):
-    (s, a, v) = ('s', 'a', 'v')
-    # normalization
-    attributes_1[v] = attributes_1[v].apply(str).apply(unidecode.unidecode).apply(str.lower)
-    attributes_2[v] = attributes_2[v].apply(str).apply(unidecode.unidecode).apply(str.lower)
-
-    # attribute value count
-    a1_cnt = attributes_1[[a, s]].groupby(by=a)[s].count().reset_index()
-    a1_cnt = suffix(a1_cnt, '1')
-    a2_cnt = attributes_2[[a, s]].groupby(by=a)[s].count().reset_index()
-    a2_cnt = suffix(a2_cnt, '2')
-
-    # value bigram jaccard
-    paired = pd.merge(prior_alignment, suffix(attributes_1, '1'))
-    paired = pd.merge(paired, suffix(attributes_2, '2'))
-    jaccard = array_qgram_jaccard_2(paired.v1.values, paired.v2.values)
-    overlap_size = paired.assign(score=jaccard).groupby(by=[a + '1', a + '2'])['score'].agg(['sum', 'size']).reset_index()
-
-    # attribute jaccard
-    overlap_size = overlap_size[overlap_size['sum'] > 0]
-    attr_jaccard = pd.merge(pd.merge(overlap_size, a1_cnt, how='left'), a2_cnt, how='left').fillna(0.0)
-    attr_jaccard['weight'] = attr_jaccard['sum'] / (attr_jaccard['s1'] + attr_jaccard['s2'] - attr_jaccard['size'])
-    return attr_jaccard
-
-
 def attribute_alignment(attributes_1, attributes_2, prior_alignment, similarity_func=None):
     (s, a, v) = ('s', 'a', 'v')
     # normalization
+    attributes_1 = pd.merge(prior_alignment.rename(columns={s + '1': s})[['s']], attributes_1)
+    attributes_2 = pd.merge(prior_alignment.rename(columns={s + '2': s})[['s']], attributes_2)
     attributes_1[v] = attributes_1[v].apply(str).apply(unidecode.unidecode).apply(str.lower)
     attributes_2[v] = attributes_2[v].apply(str).apply(unidecode.unidecode).apply(str.lower)
 
