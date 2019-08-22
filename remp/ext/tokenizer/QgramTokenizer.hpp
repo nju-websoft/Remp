@@ -68,11 +68,11 @@ namespace tokenizer {
     template<class input_type, class container_type>
     inline bool operator()(const input_type * c, container_type & grams) {
       if (c[0] != 0) {
-        grams.insert(std::make_pair<char_type>(0, c[0]));
+        grams.insert(std::make_pair((char_type)0, (char_type)c[0]));
         for (; *c != 0; ++c) {
-          grams.insert(std::make_pair<char_type>(c[0], c[1]));
+          grams.insert(std::make_pair((char_type)c[0], (char_type)c[1]));
         }
-        grams.insert(std::make_pair<char_type>(c[-1], c[0]));
+        grams.insert(std::make_pair((char_type)c[-1], (char_type)c[0]));
       }
 
       return true;
