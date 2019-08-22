@@ -14,7 +14,7 @@ def construct_similarity_vector(left_triples, right_triples, entity_candidates, 
     if aligned_attributes is None:
         shared_attributes = list(set(left_triples['a'].unique()) & set(right_triples['a'].unique()))
         aligned_attributes = pd.DataFrame({'a1': shared_attributes, 'a2': shared_attributes})
-        print(aligned_attributes)
+#         print(aligned_attributes)
     if 'attr_id' not in aligned_attributes:
         aligned_attributes['attr_id'] = aligned_attributes.index
     paired = pd.merge(entity_candidates, suffix(left_triples, '1'))

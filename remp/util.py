@@ -97,8 +97,13 @@ class CacheDecoreator(object):
                 if os.path.exists(cache_name):
                     return pd.read_pickle(cache_name)
                 else:
+                    import time
+                    start_time = time.time()
                     result = func(*args, **kwargs)
+                    end_time = time.time()
                     pd.to_pickle(result, cache_name)
+                    pd.to_pickle({'start_time': start_time, 'end_time': end_time, 'duration': end_time - start_time}, 
+                        os.path.join(self.base_dir, cate, self.task_name + '.time.pkl'))
                 return result
             return wrapper
         return real_func

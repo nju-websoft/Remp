@@ -8,7 +8,7 @@ def filter_group(vectors, unresolved, k):
         pick = unresolved[0]
         npred = ((vectors > vectors[pick]).any(1) & (vectors >= vectors[pick]).all(1)).sum()
         if npred >= k:
-            bound[pick] = True
+            bound[pick] = (vectors[pick] > 0.0).sum() > 1
             unresolved = unresolved[(vectors[unresolved] > vectors[pick]).any(1)]
         else:
             front.append(pick)
@@ -23,9 +23,13 @@ def filter_one_way(vector_frame, k, way, bounds=None):
 
     for s1, group in vector_frame.groupby(by=vector_frame.index.names[way]):
         unresolved = np.arange(0, group.shape[0])
+        single_valued = unresolved[(group.values[unresolved] > 0).sum(1) == 1]
+        unresolved = unresolved[(group.values[unresolved] > 0).sum(1) > 1]
+
         for bound in bounds:
             for row in bound:
                 unresolved = unresolved[(group.values[unresolved] > row).any(1)]
+        unresolved = np.concatenate([single_valued, unresolved])
         if len(unresolved) > k:
             (reserved, new_bound) = filter_group(group.values, unresolved, k)
             bounds.append(new_bound)
