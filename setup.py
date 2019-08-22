@@ -2,6 +2,7 @@ import io
 import os
 import re
 
+import os
 from sys import version_info
 from sysconfig import get_paths
 from setuptools import find_packages, setup
@@ -15,6 +16,16 @@ def read(filename):
     with io.open(filename, mode="r", encoding='utf-8') as fd:
         return re.sub(text_type(r':[a-z]+:`~?(.*?)`'), text_type(r'``\1``'), fd.read())
 
+if os.name == 'nt':
+    include_dirs = [os.path.join(get_paths()['platstdlib'], '..', 'Library', 'include')]
+    library_dir = os.path.join(get_paths()['platstdlib'], '..', 'Library', 'lib')
+    libraries = [f for f in os.listdir(library_dir) if (f.startswith('boost')) and ('numpy' in f or 'python' in f)]
+    extra_compile_args = ['/openmp', '/DBOOST_ALL_NO_LIB']
+else:
+    include_dirs = [get_paths()['include'] + '/../']
+    extra_compile_args = ['-fopenmp', '-std=c++11', '-Wno-sign-compare']
+    libraries = ['boost_python%d%d' % (version_info.major, version_info.minor), 'boost_numpy%d%d' % (version_info.major, version_info.minor)]
+    
 
 setup(
     name="remp",
@@ -34,10 +45,10 @@ setup(
         Extension(
             'remp.string_matching',
             sources=['remp/ext/string_matching.cpp'],
-            include_dirs = [get_paths()['include'] + '/../'],
-            extra_compile_args=['-fopenmp', '-Wno-sign-compare', '-std=c++11'],
-            extra_link_args=['-fopenmp'],
-            libraries=['boost_python', 'boost_numpy%d%d' % (version_info.major, version_info.minor)]
+            include_dirs=include_dirs,
+            extra_compile_args=extra_compile_args,
+            extra_link_args=(['-fopenmp'] if os.name == 'posix' else ['/openmp']),
+            libraries=libraries
         ),
         Extension('remp.ssj.jaccard_join_cy', ['remp/ssj/jaccard_join_cy.pyx'], language='c++'),
         Extension('remp.ssj.set_sim_join_cy', ['remp/ssj/set_sim_join_cy.pyx'], language='c++'),
