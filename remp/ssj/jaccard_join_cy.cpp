@@ -881,7 +881,7 @@ struct __pyx_obj_4remp_3ssj_15jaccard_join_cy___pyx_scope_struct_1_genexpr {
 /* "remp/ssj/jaccard_join_cy.pyx":48
  *                                       (show_progress and (job_index==n_jobs-1)), output_dir)
  *                                           for job_index in range(n_jobs))
- *         pair_cnt = sum(cnt for cnt, _ in results), sum(pairs for _, pairs in results)             # <<<<<<<<<<<<<<
+ *         pair_cnt = sum(cnt for cnt, _ in results), sum((pairs for _, pairs in results), [])             # <<<<<<<<<<<<<<
  * 
  *     pair_cnt = pair_cnt[0], [pairs.decode('utf-8') for pairs in pair_cnt[1]]
  */
@@ -1779,7 +1779,7 @@ static PyObject *__pyx_gb_4remp_3ssj_15jaccard_join_cy_15jaccard_join_cy_2genera
  *                                           threshold, comp_op, allow_empty,
  *                                       (show_progress and (job_index==n_jobs-1)), output_dir)
  *                                           for job_index in range(n_jobs))             # <<<<<<<<<<<<<<
- *         pair_cnt = sum(cnt for cnt, _ in results), sum(pairs for _, pairs in results)
+ *         pair_cnt = sum(cnt for cnt, _ in results), sum((pairs for _, pairs in results), [])
  * 
  */
   if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_n_jobs)) { __Pyx_RaiseClosureNameError("n_jobs"); __PYX_ERR(0, 47, __pyx_L1_error) }
@@ -1907,7 +1907,7 @@ static PyObject *__pyx_gb_4remp_3ssj_15jaccard_join_cy_15jaccard_join_cy_2genera
  *                                           threshold, comp_op, allow_empty,
  *                                       (show_progress and (job_index==n_jobs-1)), output_dir)             # <<<<<<<<<<<<<<
  *                                           for job_index in range(n_jobs))
- *         pair_cnt = sum(cnt for cnt, _ in results), sum(pairs for _, pairs in results)
+ *         pair_cnt = sum(cnt for cnt, _ in results), sum((pairs for _, pairs in results), [])
  */
     if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_show_progress)) { __Pyx_RaiseClosureNameError("show_progress"); __PYX_ERR(0, 46, __pyx_L1_error) }
     __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_show_progress); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 46, __pyx_L1_error)
@@ -2029,7 +2029,7 @@ static PyObject *__pyx_gb_4remp_3ssj_15jaccard_join_cy_15jaccard_join_cy_2genera
  *                                           threshold, comp_op, allow_empty,
  *                                       (show_progress and (job_index==n_jobs-1)), output_dir)
  *                                           for job_index in range(n_jobs))             # <<<<<<<<<<<<<<
- *         pair_cnt = sum(cnt for cnt, _ in results), sum(pairs for _, pairs in results)
+ *         pair_cnt = sum(cnt for cnt, _ in results), sum((pairs for _, pairs in results), [])
  * 
  */
   }
@@ -2072,7 +2072,7 @@ static PyObject *__pyx_gb_4remp_3ssj_15jaccard_join_cy_15jaccard_join_cy_5genera
 /* "remp/ssj/jaccard_join_cy.pyx":48
  *                                       (show_progress and (job_index==n_jobs-1)), output_dir)
  *                                           for job_index in range(n_jobs))
- *         pair_cnt = sum(cnt for cnt, _ in results), sum(pairs for _, pairs in results)             # <<<<<<<<<<<<<<
+ *         pair_cnt = sum(cnt for cnt, _ in results), sum((pairs for _, pairs in results), [])             # <<<<<<<<<<<<<<
  * 
  *     pair_cnt = pair_cnt[0], [pairs.decode('utf-8') for pairs in pair_cnt[1]]
  */
@@ -2986,7 +2986,7 @@ static PyObject *__pyx_pf_4remp_3ssj_15jaccard_join_cy_jaccard_join_cy(CYTHON_UN
     /* "remp/ssj/jaccard_join_cy.pyx":48
  *                                       (show_progress and (job_index==n_jobs-1)), output_dir)
  *                                           for job_index in range(n_jobs))
- *         pair_cnt = sum(cnt for cnt, _ in results), sum(pairs for _, pairs in results)             # <<<<<<<<<<<<<<
+ *         pair_cnt = sum(cnt for cnt, _ in results), sum((pairs for _, pairs in results), [])             # <<<<<<<<<<<<<<
  * 
  *     pair_cnt = pair_cnt[0], [pairs.decode('utf-8') for pairs in pair_cnt[1]]
  */
@@ -2997,65 +2997,75 @@ static PyObject *__pyx_pf_4remp_3ssj_15jaccard_join_cy_jaccard_join_cy(CYTHON_UN
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_1 = __pyx_pf_4remp_3ssj_15jaccard_join_cy_15jaccard_join_cy_6genexpr(((PyObject*)__pyx_cur_scope)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 48, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 48, __pyx_L1_error)
+    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 48, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 48, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_GIVEREF(__pyx_t_7);
-    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_7);
+    __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 48, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_GIVEREF(__pyx_t_1);
+    PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_3);
-    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_3);
+    __pyx_t_1 = 0;
+    __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_sum, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 48, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 48, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_GIVEREF(__pyx_t_7);
+    PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_7);
+    __Pyx_GIVEREF(__pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_3);
     __pyx_t_7 = 0;
     __pyx_t_3 = 0;
-    __pyx_v_pair_cnt = __pyx_t_1;
-    __pyx_t_1 = 0;
+    __pyx_v_pair_cnt = __pyx_t_2;
+    __pyx_t_2 = 0;
   }
   __pyx_L4:;
 
   /* "remp/ssj/jaccard_join_cy.pyx":50
- *         pair_cnt = sum(cnt for cnt, _ in results), sum(pairs for _, pairs in results)
+ *         pair_cnt = sum(cnt for cnt, _ in results), sum((pairs for _, pairs in results), [])
  * 
  *     pair_cnt = pair_cnt[0], [pairs.decode('utf-8') for pairs in pair_cnt[1]]             # <<<<<<<<<<<<<<
  *     # revert the return_set flag of tokenizer, in case it was modified.
  *     if revert_tokenizer_return_set_flag:
  */
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_pair_cnt, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_pair_cnt, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_pair_cnt, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   if (likely(PyList_CheckExact(__pyx_t_7)) || PyTuple_CheckExact(__pyx_t_7)) {
-    __pyx_t_2 = __pyx_t_7; __Pyx_INCREF(__pyx_t_2); __pyx_t_6 = 0;
+    __pyx_t_1 = __pyx_t_7; __Pyx_INCREF(__pyx_t_1); __pyx_t_6 = 0;
     __pyx_t_9 = NULL;
   } else {
-    __pyx_t_6 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 50, __pyx_L1_error)
+    __pyx_t_6 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_9 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 50, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   for (;;) {
     if (likely(!__pyx_t_9)) {
-      if (likely(PyList_CheckExact(__pyx_t_2))) {
-        if (__pyx_t_6 >= PyList_GET_SIZE(__pyx_t_2)) break;
+      if (likely(PyList_CheckExact(__pyx_t_1))) {
+        if (__pyx_t_6 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_7 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_6); __Pyx_INCREF(__pyx_t_7); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 50, __pyx_L1_error)
+        __pyx_t_7 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_6); __Pyx_INCREF(__pyx_t_7); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 50, __pyx_L1_error)
         #else
-        __pyx_t_7 = PySequence_ITEM(__pyx_t_2, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 50, __pyx_L1_error)
+        __pyx_t_7 = PySequence_ITEM(__pyx_t_1, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 50, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         #endif
       } else {
-        if (__pyx_t_6 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
+        if (__pyx_t_6 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_6); __Pyx_INCREF(__pyx_t_7); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 50, __pyx_L1_error)
+        __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_6); __Pyx_INCREF(__pyx_t_7); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 50, __pyx_L1_error)
         #else
-        __pyx_t_7 = PySequence_ITEM(__pyx_t_2, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 50, __pyx_L1_error)
+        __pyx_t_7 = PySequence_ITEM(__pyx_t_1, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 50, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         #endif
       }
     } else {
-      __pyx_t_7 = __pyx_t_9(__pyx_t_2);
+      __pyx_t_7 = __pyx_t_9(__pyx_t_1);
       if (unlikely(!__pyx_t_7)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
@@ -3088,17 +3098,17 @@ static PyObject *__pyx_pf_4remp_3ssj_15jaccard_join_cy_jaccard_join_cy(CYTHON_UN
     if (unlikely(__Pyx_ListComp_Append(__pyx_t_3, (PyObject*)__pyx_t_7))) __PYX_ERR(0, 50, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GIVEREF(__pyx_t_1);
-  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_3);
-  PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_3);
-  __pyx_t_1 = 0;
-  __pyx_t_3 = 0;
-  __Pyx_DECREF_SET(__pyx_v_pair_cnt, __pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_3);
   __pyx_t_2 = 0;
+  __pyx_t_3 = 0;
+  __Pyx_DECREF_SET(__pyx_v_pair_cnt, __pyx_t_1);
+  __pyx_t_1 = 0;
 
   /* "remp/ssj/jaccard_join_cy.pyx":52
  *     pair_cnt = pair_cnt[0], [pairs.decode('utf-8') for pairs in pair_cnt[1]]
@@ -3119,22 +3129,22 @@ static PyObject *__pyx_pf_4remp_3ssj_15jaccard_join_cy_jaccard_join_cy(CYTHON_UN
  */
     __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_tokenizer, __pyx_n_s_set_return_set); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = NULL;
+    __pyx_t_2 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_1)) {
+      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_2)) {
         PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_1);
+        __Pyx_INCREF(__pyx_t_2);
         __Pyx_INCREF(function);
         __Pyx_DECREF_SET(__pyx_t_3, function);
       }
     }
-    __pyx_t_2 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_1, Py_False) : __Pyx_PyObject_CallOneArg(__pyx_t_3, Py_False);
-    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, Py_False) : __Pyx_PyObject_CallOneArg(__pyx_t_3, Py_False);
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
     /* "remp/ssj/jaccard_join_cy.pyx":52
  *     pair_cnt = pair_cnt[0], [pairs.decode('utf-8') for pairs in pair_cnt[1]]

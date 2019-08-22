@@ -45,7 +45,7 @@ def jaccard_join_cy(lvalues, rvalues, lkeys, rkeys,
                                           threshold, comp_op, allow_empty,
                                       (show_progress and (job_index==n_jobs-1)), output_dir)
                                           for job_index in range(n_jobs))
-        pair_cnt = sum(cnt for cnt, _ in results), sum(pairs for _, pairs in results)
+        pair_cnt = sum(cnt for cnt, _ in results), sum((pairs for _, pairs in results), [])
 
     pair_cnt = pair_cnt[0], [pairs.decode('utf-8') for pairs in pair_cnt[1]]
     # revert the return_set flag of tokenizer, in case it was modified.
