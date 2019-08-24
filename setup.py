@@ -23,7 +23,7 @@ if os.name == 'nt':
     extra_compile_args = ['/openmp', '/DBOOST_ALL_NO_LIB']
 else:
     include_dirs = [get_paths()['include'] + '/../']
-    extra_compile_args = ['-fopenmp', '-std=c++11', '-Wno-sign-compare']
+    extra_compile_args = ['-fopenmp', '-std=c++11', '-Wno-sign-compare',]
     libraries = ['boost_python%d%d' % (version_info.major, version_info.minor), 'boost_numpy%d%d' % (version_info.major, version_info.minor)]
     
 
@@ -47,7 +47,7 @@ setup(
             sources=['remp/ext/string_matching.cpp'],
             include_dirs=include_dirs,
             extra_compile_args=extra_compile_args,
-            extra_link_args=(['-fopenmp'] if os.name == 'posix' else ['/openmp']),
+            extra_link_args=(['-lgomp'] if os.name == 'posix' else ['/openmp']),
             libraries=libraries
         ),
         Extension('remp.ssj.jaccard_join_cy', ['remp/ssj/jaccard_join_cy.pyx'], language='c++'),

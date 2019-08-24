@@ -80,6 +80,14 @@ np::ndarray array_similarty_function(np::ndarray X, np::ndarray Y) {
     p::make_tuple(N), p::make_tuple(sizeof(float)), p::object());
 }
 
+
+template<template<class> class Measure, template<typename> class Tokenizer>
+float pair_similarty_function(PyObject * x, PyObject * y) {
+  PyOjbectSimilarityFunction<Measure, Tokenizer> func;
+
+  return func(x, y);
+}
+
 template<class T> using QgramTokenizer1 = tokenizer::QgramTokenizer<1, T>;
 template<class T> using QgramTokenizer2 = tokenizer::QgramTokenizer<2, T>;
 template<class T> using QgramTokenizer3 = tokenizer::QgramTokenizer<3, T>;
@@ -106,4 +114,15 @@ BOOST_PYTHON_MODULE(string_matching)
   p::def("array_qgram_jaccard_7", array_similarty_function<similarity_measure::Jaccard, QgramTokenizer7>);
   p::def("array_qgram_jaccard_8", array_similarty_function<similarity_measure::Jaccard, QgramTokenizer8>);
   p::def("array_qgram_jaccard_9", array_similarty_function<similarity_measure::Jaccard, QgramTokenizer9>);
+
+  p::def("whitespace_jaccard", pair_similarty_function<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>);
+  p::def("qgram_jaccard_1", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer1>);
+  p::def("qgram_jaccard_2", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer2>);
+  p::def("qgram_jaccard_3", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer3>);
+  p::def("qgram_jaccard_4", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer4>);
+  p::def("qgram_jaccard_5", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer5>);
+  p::def("qgram_jaccard_6", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer6>);
+  p::def("qgram_jaccard_7", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer7>);
+  p::def("qgram_jaccard_8", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer8>);
+  p::def("qgram_jaccard_9", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer9>);
 }
