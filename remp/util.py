@@ -35,8 +35,8 @@ def get_column(df, column):
 
 def matching_quality(result_table, gold_table, s1='s1', s2='s2'):
     if len(result_table) > 0:
-        fp = len(pd.merge(result_table, gold_table, on=[s1, s2], how='inner'))
-        (p, r) = (fp / len(result_table), fp / len(gold_table))
+        tp = len(pd.merge(result_table, gold_table, on=[s1, s2], how='inner'))
+        (p, r) = (tp / len(result_table), tp / len(gold_table))
         if p == 0.0 or r == 0.0:
             f = p = r = 0.0
         else:
@@ -107,3 +107,9 @@ class CacheDecoreator(object):
                 return result
             return wrapper
         return real_func
+
+    def read_cache(self, cate):
+        return pd.read_pickle(os.path.join(self.base_dir, cate, self.task_name + '.pkl'))
+
+    def read_time(self, cate):
+        return pd.read_pickle(os.path.join(self.base_dir, cate, self.task_name + '.time.pkl'))

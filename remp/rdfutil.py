@@ -6,16 +6,18 @@ import networkx as nx
 import pandas as pd
 import numpy as np
 
-namespace_inverse_index = {}
-for k, v in itertools.chain(rdflib.__dict__.items(), rdflib.namespace.__dict__.items()):
-    if type(v) == rdflib.namespace.Namespace or type(v) == rdflib.namespace.ClosedNamespace:
-        namespace_inverse_index[str(v)[0:-1]] = k.lower()
+namespace_index = {}
+for k, v in itertools.chain(
+        rdflib.__dict__.items(), rdflib.namespace.__dict__.items()):
+    if type(v) in (rdflib.namespace.Namespace,
+                   rdflib.namespace.ClosedNamespace):
+        namespace_index[str(v)[0:-1]] = k.lower()
 
-namespace_inverse_index['http://www.w3.org/1999/02/22-rdf-syntax-ns'] = 'rdfs'
-namespace_inverse_index['http://www.instancematching.org/IIMB2012/ADDONS'] = 'addons'
-namespace_inverse_index['http://www.w3.org/2003/01/geo/wgs84_pos'] = 'wgs84_pos'
-namespace_inverse_index['http://kmi.open.ac.uk/fusion/dblp'] = 'dblp'
-namespace_inverse_index['http://lsdis.cs.uga.edu/projects/semdis/opus'] = 'opus'
+namespace_index['http://www.w3.org/1999/02/22-rdf-syntax-ns'] = 'rdfs'
+namespace_index['http://www.instancematching.org/IIMB2012/ADDONS'] = 'addons'
+namespace_index['http://www.w3.org/2003/01/geo/wgs84_pos'] = 'wgs84_pos'
+namespace_index['http://kmi.open.ac.uk/fusion/dblp'] = 'dblp'
+namespace_index['http://lsdis.cs.uga.edu/projects/semdis/opus'] = 'opus'
 
 namespace_prefixes = [
     ('http://purl.org/dc/elements/1.1/', 'purl'),
@@ -39,8 +41,8 @@ def shrink_uri(uri):
     if type(uri) != rdflib.term.URIRef and type(uri) != str:
         return uri
     parts = str(uri).split('#')
-    if len(parts) == 2 and parts[0] in namespace_inverse_index:
-        return namespace_inverse_index[parts[0]] + ':' + parts[1]
+    if len(parts) == 2 and parts[0] in namespace_index:
+        return namespace_index[parts[0]] + ':' + parts[1]
     else:
         for (prefix, ns) in namespace_prefixes:
             if uri.startswith(prefix):
@@ -61,7 +63,8 @@ class TripleIteratorStore(rdflib.store.Store):
         self.bnode_handler = bnode_handler
 
     def add(self, triple, context, quoted=False):
-        if type(triple[0]) == rdflib.term.BNode or type(triple[2]) == rdflib.term.BNode:
+        if type(triple[0]) == rdflib.term.BNode or type(
+           triple[2]) == rdflib.term.BNode:
             if self.bnode_handler is not None:
                 self.bnode_handler(triple)
         elif type(triple[2]) == rdflib.term.URIRef:
@@ -77,15 +80,20 @@ class TripleIteratorStore(rdflib.store.Store):
         pass
 
 
-OAEI_ALIGNMENT_NAMESPACE = rdflib.namespace.Namespace('http://knowledgeweb.semanticweb.org/heterogeneity/alignment#')
+OAEI_ALIGNMENT_NAMESPACE = rdflib.namespace.Namespace(
+    'http://knowledgeweb.semanticweb.org/heterogeneity/alignment#')
 
 
 def read_oaei_alignment(rdf_file_path):
     r = rdflib.Graph()
     r.parse(source=rdf_file_path)
-
+    sparql = ''.join([
+        'select ?e1 ?e2 where {',
+        '?map oaei:entity1 ?e1 .',
+        '?map oaei:entity2 ?e2 }'
+        ])
     align = r.query(
-        'select ?e1 ?e2 where { ?map oaei:entity1 ?e1 . ?map oaei:entity2 ?e2 }',
+        sparql,
         initNs={'oaei': OAEI_ALIGNMENT_NAMESPACE}
     )
 
@@ -110,7 +118,8 @@ class TripleLoader(object):
 
     def _handle_relation_triple(self, triple):
         (s, r, o) = triple
-        self.relations.append(dict(s=shrink_uri(s), r=shrink_uri(r), o=shrink_uri(o)))
+        self.relations.append(dict(
+            s=shrink_uri(s), r=shrink_uri(r), o=shrink_uri(o)))
 
     def _handle_bnode_triple(self, triple):
         (s, p, o) = triple
@@ -129,26 +138,34 @@ def extract_axioms(bnodes, relations):
     disjoint_types = []
     for disjoint_axiom in axioms[axioms['o'] == 'owl:AllDisjointClasses']['s']:
         classes = []
-        next_member = axioms[(axioms['s'] == disjoint_axiom) & (axioms['p'] == 'owl:members')]['o'].values
+        next_member = axioms[(axioms['s'] == disjoint_axiom) & (
+            axioms['p'] == 'owl:members')]['o'].values
         while len(next_member) > 0 and type(next_member) == np.ndarray:
             next_member = next_member[0]
-            classes.append(axioms[(axioms['s'] == next_member) & (axioms['p'] == 'rdfs:first')]['o'].values)
-            next_member = axioms[(axioms['s'] == next_member) & (axioms['p'] == 'rdfs:rest')]['o'].values
+            classes.append(axioms[(axioms['s'] == next_member) & (
+                axioms['p'] == 'rdfs:first')]['o'].values)
+            next_member = axioms[(axioms['s'] == next_member) & (
+                axioms['p'] == 'rdfs:rest')]['o'].values
         classes = [c[0] for c in classes[:-1]]
         disjoint_types.append(classes)
-    
-    inverse_properties = relations[relations['r'] == 'owl:inverseOf'][['s', 'o']].values
-    
+
+    inverse_properties = relations[relations['r'] == 'owl:inverseOf']
+    inverse_properties = inverse_properties[['s', 'o']].values
+
     sub_classes = relations[relations['r'] == 'rdfs:subClassOf']
-    class_graph = nx.from_pandas_edgelist(sub_classes, source='o', target='s', create_using=nx.DiGraph())
-    return dict(disjoint_types=disjoint_types, inverse_properties=inverse_properties, type_graph=class_graph)
+    class_graph = nx.from_pandas_edgelist(
+        sub_classes, source='o', target='s', create_using=nx.DiGraph())
+    return dict(
+        disjoint_types=disjoint_types,
+        inverse_properties=inverse_properties,
+        type_graph=class_graph)
 
 
-def remove_ontology(relation_dataframe, relation='r'):
-    relation_dataframe = relation_dataframe[relation_dataframe[relation] != 'owl:inverseOf']
-    relation_dataframe = relation_dataframe[relation_dataframe[relation] != 'rdfs:type']
-    relation_dataframe = relation_dataframe[relation_dataframe[relation] != 'rdfs:domain']
-    relation_dataframe = relation_dataframe[relation_dataframe[relation] != 'rdfs:range']
-    relation_dataframe = relation_dataframe[relation_dataframe[relation] != 'rdfs:subClassOf']
-    relation_dataframe = relation_dataframe[relation_dataframe[relation] != 'rdfs:subPropertyOf']
-    return relation_dataframe
+def remove_ontology(relation_df, relation='r'):
+    relation_df = relation_df[relation_df[relation] != 'owl:inverseOf']
+    relation_df = relation_df[relation_df[relation] != 'rdfs:type']
+    relation_df = relation_df[relation_df[relation] != 'rdfs:domain']
+    relation_df = relation_df[relation_df[relation] != 'rdfs:range']
+    relation_df = relation_df[relation_df[relation] != 'rdfs:subClassOf']
+    relation_df = relation_df[relation_df[relation] != 'rdfs:subPropertyOf']
+    return relation_df
