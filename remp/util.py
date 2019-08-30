@@ -11,22 +11,22 @@ def suffix(df, column_suffix):
 
 
 class FixedErrorOracle(object):
-    def __init__(self, error_rate, repeats=5, threshold=4):
-        hit = np.arange(threshold, repeats + 1)
-        true_prob = (np.exp(np.log(error_rate) * hit + np.log(1 - error_rate) * (repeats - hit)) * comb(repeats, hit)).sum()
-        error_rate = 1 - error_rate
-        false_prob = (np.exp(np.log(error_rate) * hit + np.log(1 - error_rate) * (repeats - hit)) * comb(repeats, hit)).sum()
-        self.false_threshold = false_prob
-        self.true_threshold = 1 - true_prob
+    def __init__(self, error_rate, repeats=5, low=0.2, high=0.8):
+        np.random.seed(0)
+        self.answers = np.random.binomial(
+            repeats, 1 - error_rate, 1000000) / repeats
+        self.high = high
+        self.low = low
+        self.i = 0
 
     def get_answer(self, true_answer):
-        point = np.random.rand()
-        if point >= self.true_threshold:
+        self.i = (self.i + 1) % 1000000
+        if self.answers[self.i] >= self.high:
             return true_answer
-        elif point <= self.false_threshold:
-            return not true_answer
+        elif self.answers[self.i] <= self.low:
+            return -true_answer
         else:
-            return None
+            return 0.0
 
 
 def get_column(df, column):
