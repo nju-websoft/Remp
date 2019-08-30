@@ -89,12 +89,13 @@ class CacheDecoreator(object):
         self.base_dir = base_dir
         self.task_name = task_name
 
-    def category(self, cate):
+    def category(self, cate, force=False):
         def real_func(func):
             def wrapper(*args, **kwargs):
                 import os
-                cache_name = os.path.join(self.base_dir, cate, self.task_name + '.pkl')
-                if os.path.exists(cache_name):
+                cache_name = os.path.join(
+                    self.base_dir, cate, self.task_name + '.pkl')
+                if not force and os.path.exists(cache_name):
                     return pd.read_pickle(cache_name)
                 else:
                     import time
@@ -102,14 +103,22 @@ class CacheDecoreator(object):
                     result = func(*args, **kwargs)
                     end_time = time.time()
                     pd.to_pickle(result, cache_name)
-                    pd.to_pickle({'start_time': start_time, 'end_time': end_time, 'duration': end_time - start_time}, 
-                        os.path.join(self.base_dir, cate, self.task_name + '.time.pkl'))
+                    pd.to_pickle(
+                        {
+                            'start_time': start_time,
+                            'end_time': end_time,
+                            'duration': end_time - start_time
+                        },
+                        os.path.join(
+                            self.base_dir, cate, self.task_name + '.time.pkl'))
                 return result
             return wrapper
         return real_func
 
     def read_cache(self, cate):
-        return pd.read_pickle(os.path.join(self.base_dir, cate, self.task_name + '.pkl'))
+        return pd.read_pickle(os.path.join(self.base_dir, cate,
+                              self.task_name + '.pkl'))
 
     def read_time(self, cate):
-        return pd.read_pickle(os.path.join(self.base_dir, cate, self.task_name + '.time.pkl'))
+        return pd.read_pickle(os.path.join(self.base_dir, cate,
+                              self.task_name + '.time.pkl'))
