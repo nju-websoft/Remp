@@ -7,7 +7,14 @@ from scipy.special import comb
 
 def suffix(df, column_suffix):
     columns = df.columns
-    return df.rename(columns=dict((column, column + column_suffix) for column in columns))
+    return df.rename(columns=dict((column, column + column_suffix)
+                     for column in columns))
+
+
+def prefix(df, column_prefix):
+    columns = df.columns
+    return df.rename(columns=dict((column, column_prefix + column)
+                     for column in columns))
 
 
 class FixedErrorOracle(object):
