@@ -109,3 +109,43 @@ def attribute_alignment_slow(attributes_1,
             mwm[i] = (mwm[i][1], mwm[i][0])
 
     return pd.DataFrame(mwm, columns=[s + '1', s + '2'])
+
+
+def relation_jaccard(relations_1, relations_2, prior_matching):
+    r1_cnt = relations_1[['r', 's']].groupby(by='r')['s'].count().reset_index()
+    r1_cnt = suffix(r1_cnt, '1')
+    r2_cnt = relations_2[['r', 's']].groupby(by='r')['s'].count().reset_index()
+    r2_cnt = suffix(r2_cnt, '2')
+
+    inner = pd.merge(prior_matching, suffix(relations_1, '1'))
+    inner = inner[['s2', 'r1', 'o1']]
+    sm2om = prior_matching.rename(columns={'s1': 'o1', 's2': 'o2'})
+    inner = pd.merge(sm2om, inner)[['s2', 'r1', 'o2']]
+    inner = pd.merge(inner, suffix(relations_2, '2'))
+    s = inner[['r1', 'r2']].groupby(by=['r1', 'r2']).apply(len)
+    s.name = 'overlap'
+
+    s = pd.merge(s.reset_index(), r1_cnt)
+    s = pd.merge(s.reset_index(), r2_cnt)
+    s['jaccard'] = s['overlap'] / (s['s1'] + s['s2'] - s['overlap'])
+    s = s[['r1', 'r2', 'jaccard']]
+    return s
+
+
+def attribute_jaccard(a1, a2, prior_matching):
+    r1_cnt = a1[['a', 's']].groupby(by='a')['s'].count().reset_index()
+    r1_cnt = suffix(r1_cnt, '1')
+    r2_cnt = a2[['a', 's']].groupby(by='a')['s'].count().reset_index()
+    r2_cnt = suffix(r2_cnt, '2')
+
+    inner = pd.merge(prior_matching, suffix(a1, '1'))[['s2', 'a1', 'v1']]
+    inner = inner.rename(columns={'v1': 'v2'})
+    inner = pd.merge(inner, suffix(a2, '2'))
+    s = inner[['a1', 'a2']].groupby(by=['a1', 'a2']).apply(len)
+    s.name = 'overlap'
+
+    s = pd.merge(s.reset_index(), r1_cnt)
+    s = pd.merge(s.reset_index(), r2_cnt)
+    s['jaccard'] = s['overlap'] / (s['s1'] + s['s2'] - s['overlap'])
+    s = s[['a1', 'a2', 'jaccard']]
+    return s
