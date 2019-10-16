@@ -41,6 +41,9 @@ def relationship_consistency_mle(M, N, cnt, L=None):
         A1 = (M * cnt).sum()
         A2 = (N * cnt).sum()
 
+        if B / A1 < 0.1 and B / A2 < 0.1:
+            continue
+
         if B < A1 and B > 0:
             p3 = np.log(B / A1) * B + np.log(1 - B / A1) * (A1 - B)
         else:
@@ -73,6 +76,7 @@ def relationship_consistency(M_in, M_p, r1, r2):
         else:
             lll = df[['o1', 'o2', 'l']].groupby(by=['o1', 'o2', 'l']).size()
             lll = lll.rename('count').reset_index()
+            lll = lll[(lll['o1'] <= 1000) & (lll['o2'] <= 1000)]
             (e1, e2) = relationship_consistency_mle(
                 lll['o1'], lll['o2'], lll['count'], lll['l'])
         consistency.append([r1, r2, e1, e2])
