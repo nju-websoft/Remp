@@ -45,7 +45,7 @@ def construct_similarity_vector(left_triples, right_triples, entity_candidates,
 
     df = pd.pivot_table(paired, values=['sim'], index=['s1', 's2'],
                         columns='attr_id', aggfunc='max')
-    return paired
+    return df
 
 
 def construct_similarity_vector_from_tuples(
@@ -87,3 +87,20 @@ def compute_extended_jaccard(graph, s='s', o='o', r='r'):
     ej = pd.merge(ej, o_n)
     ej['ej'] = ej['s'] / (ej['s'] + ej['o_n'] - ej[o + '1'] - ej[o + '2'])
     return ej[[s + '1', s + '2', r, 'ej']]
+
+def prior_probabilities(dataset, M_pruned):
+    import unidecode
+    import tempfile
+    cache_base_dir = tempfile.mkdtemp('remp')
+    (l1, l2) = dataset.label
+    labels_1 = dataset.attributes_1[
+        dataset.attributes_1['a'] == l1][['s', 'a', 'v']]
+    labels_2 = dataset.attributes_2[
+        dataset.attributes_2['a'] == l2][['s', 'a', 'v']]
+
+    labels_1['v'] = labels_1['v'].apply(
+        str).apply(unidecode.unidecode).str.lower()
+    labels_2['v'] = labels_2['v'].apply(
+        str).apply(unidecode.unidecode).str.lower()
+    
+    return construct_similarity_list(labels_1, labels_2, M_pruned)[['s1', 's2', 'sim']]

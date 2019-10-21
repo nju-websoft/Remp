@@ -75,7 +75,7 @@ def propagate2neighbor(edges, source, target, consistency):
                 u1 = np.unique(co1)
                 u2 = np.unique(co2)
                 if len(u1) ** len(u2) > 1000000:
-                    print(len(u1), len(u2))
+                    # print(len(u1), len(u2))
                     continue
                 if len(u1) < len(u2):
                     forward.loc[index[cluster == i]] = matching_probability(

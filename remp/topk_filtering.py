@@ -107,30 +107,30 @@ def filter_one_way_df(vector_frame, k, way, bounds=None, show_progress=False):
     return bounds, pd.concat(reserveds)
 
 
-# def filter_one_way(vector_frame, k, way, bounds=None):
-#     if bounds is None:
-#         bounds = []
-#     reserveds = []
+def filter_one_way(vector_frame, k, way, bounds=None):
+    if bounds is None:
+        bounds = []
+    reserveds = []
 
-#     for s1, group in vector_frame.groupby(by=vector_frame.index.names[way]):
-#         unresolved = np.arange(0, group.shape[0])
-#         single_valued = unresolved[(group.values[unresolved] > 0).sum(1)
-#                                    == 1]
-#         unresolved = unresolved[(group.values[unresolved] > 0).sum(1) > 1]
+    for s1, group in vector_frame.groupby(by=vector_frame.index.names[way]):
+        unresolved = np.arange(0, group.shape[0])
+        single_valued = unresolved[(group.values[unresolved] > 0).sum(1)
+                                   == 1]
+        unresolved = unresolved[(group.values[unresolved] > 0).sum(1) > 1]
 
-#         for bound in bounds:
-#             for row in bound:
-#                 unresolved = unresolved[(group.values[unresolved]
-#                                          > row).any(1)]
-#         unresolved = np.concatenate([single_valued, unresolved])
-#         if len(unresolved) > k:
-#             (reserved, new_bound) = filter_group(group.values, unresolved, k)
-#             if len(new_bound) > 0:
-#                 bounds.append(new_bound)
-#             reserveds.append(group.index[reserved].values)
-#         else:
-#             reserveds.append(group.index[unresolved].values)
-#     return bounds, np.concatenate(reserveds)
+        for bound in bounds:
+            for row in bound:
+                unresolved = unresolved[(group.values[unresolved]
+                                         > row).any(1)]
+        unresolved = np.concatenate([single_valued, unresolved])
+        if len(unresolved) > k:
+            (reserved, new_bound) = filter_group(group.values, unresolved, k)
+            if len(new_bound) > 0:
+                bounds.append(new_bound)
+            reserveds.append(group.index[reserved].values)
+        else:
+            reserveds.append(group.index[unresolved].values)
+    return bounds, np.concatenate(reserveds)
 
 
 # def filter_two_way(vector_frame, k):
