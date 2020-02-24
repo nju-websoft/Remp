@@ -8,7 +8,7 @@ Jiacheng Huang, Wei Hu*, Zhifeng Bao, Yuzhong Qu. [Crowdsourced Collective Entit
 ## Quick Start
 [Example notebook](https://nbviewer.jupyter.org/github/nju-websoft/Remp/blob/master/example.ipynb)
 
-## CITATION
+## Citation
 If you find our work useful, please kindly cite it as follows:
 
 ```
