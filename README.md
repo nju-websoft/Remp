@@ -12,7 +12,7 @@ Jiacheng Huang, Wei Hu*, Zhifeng Bao, Yuzhong Qu. [Crowdsourced Collective Entit
 If you find our work useful, please kindly cite it as follows:
 
 ```
-@inproceedings{RSN,
+@inproceedings{Remp,
   author    = {Jiacheng Huang and Wei Hu and Zhifeng Bao and Yuzhong Qu},
   title     = {Crowdsourced Collective Entity Resolution with Relational Match Propagation},
   booktitle = {ICDE},
