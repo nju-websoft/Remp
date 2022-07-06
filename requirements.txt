@@ -1,5 +1,5 @@
 Cython==0.29.12
-lxml==4.3.4
+lxml==4.9.1
 networkx==2.3
 numpy==1.16.4
 pandas==0.25.1
