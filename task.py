@@ -5,10 +5,10 @@ from remp import string_matching
 
 words = ['kitten', 'sitting', 'sitting kitten']
 n = len(words)
-objarr = np.array(words, dtype=np.object)
-print(string_matching.array_whitespace_jaccard(np.repeat(objarr, n), np.tile(objarr, n)).reshape((n, n)))
+objarr = np.array(words, dtype='O')
+print(string_matching.array_whitespace_jaccard(list(np.repeat(objarr, n)), list(np.tile(objarr, n))).reshape((n, n)))
 # print()
-print(string_matching.array_qgram_jaccard_2(np.repeat(objarr, n), np.tile(objarr, n)).reshape((n, n)))
+print(string_matching.array_qgram_jaccard_2(list(np.repeat(objarr, n)), list(np.tile(objarr, n))).reshape((n, n)))
 # print(string_matching.array_qgram_jaccard_3(np.repeat(objarr, n), np.tile(objarr, n)).reshape((n, n)))
 # print(string_matching.array_qgram_jaccard_4(np.repeat(objarr, n), np.tile(objarr, n)).reshape((n, n)))
 # print(string_matching.array_qgram_jaccard_5(np.repeat(objarr, n), np.tile(objarr, n)).reshape((n, n)))

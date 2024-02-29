@@ -37,7 +37,7 @@ def attribute_alignment(attributes_1,
     # value bigram jaccard
     paired = pd.merge(prior_alignment, suffix(attributes_1, '1'))
     paired = pd.merge(paired, suffix(attributes_2, '2'))
-    jaccard = array_qgram_jaccard_2(paired.v1.values, paired.v2.values)
+    jaccard = array_qgram_jaccard_2(list(paired.v1.values), list(paired.v2.values))
     overlap_size = paired.assign(score=jaccard).groupby(
         by=[a + '1', a + '2'])['score'].agg(['sum', 'size']).reset_index()
 

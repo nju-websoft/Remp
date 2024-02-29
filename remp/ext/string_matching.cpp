@@ -1,15 +1,16 @@
-#include <boost/python/numpy.hpp>
+#include <iostream>
+#include <functional>
+#include <omp.h>
+
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+
 #include "tokenizer/QgramTokenizer.hpp"
 #include "tokenizer/WhitespaceTokenizer.hpp"
 #include "similarity_measure/jaccard.hpp"
 #include "similarity_measure/cosine.hpp"
 
-#include <iostream>
-#include <functional>
-#include <omp.h>
-
-namespace p = boost::python;
-namespace np = boost::python::numpy;
+namespace py = pybind11;
 
 template<template<class> class Measure, template<typename> class Tokenizer>
 struct PyOjbectSimilarityFunction {
@@ -53,32 +54,25 @@ private:
 
 
 template<template<class> class Measure, template<typename> class Tokenizer>
-np::ndarray array_similarty_function(np::ndarray X, np::ndarray Y) {
-  if (X.get_nd() != 1 || Y.get_nd() != 1) {
-    std::cout << "X and Y should be 1-dimentional array" << std::endl;
-    throw std::runtime_error("X and Y should be 1-dimentional array");
-  }
+py::array_t<double> array_similarty_function(py::list X, py::list Y)
+{
+  py::array_t<double> result(std::min(X.size(), Y.size()));
+  py::buffer_info result_buf = result.request();
+  double *output = static_cast<double *>(result_buf.ptr);
 
-  if (X.shape(0) != Y.shape(0)) {
-    std::cout << "X and Y should be same size" << std::endl;
-    throw std::runtime_error("X and Y should be same size");
-  }
+  int N = std::min(X.size(), Y.size());
 
-  unsigned long N = X.shape(0);
-  float *sims = new float[N];
-
-  PyObject ** _X = reinterpret_cast<PyObject **>(X.get_data());
-  PyObject ** _Y = reinterpret_cast<PyObject **>(Y.get_data());
+  PyObject **x_ptr = ((PyListObject *)X.ptr())->ob_item;
+  PyObject **y_ptr = ((PyListObject *)Y.ptr())->ob_item;
 
   PyOjbectSimilarityFunction<Measure, Tokenizer> func;
 
   #pragma omp parallel for
   for (int i = 0; i < N; i++) {
-    sims[i] = func(_X[i], _Y[i]);
+    output[i] = func(x_ptr[i], y_ptr[i]);
   }
 
-  return np::from_data(sims, np::dtype::get_builtin<float>(),
-    p::make_tuple(N), p::make_tuple(sizeof(float)), p::object());
+  return result;
 }
 
 
@@ -100,52 +94,49 @@ template<class T> using QgramTokenizer8 = tokenizer::QgramTokenizer<8, T>;
 template<class T> using QgramTokenizer9 = tokenizer::QgramTokenizer<9, T>;
 
 
-BOOST_PYTHON_MODULE(string_matching)
+PYBIND11_MODULE(string_matching, m)
 {
-  Py_Initialize();
-  np::initialize();
+  m.def("array_whitespace_jaccard", &array_similarty_function<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>);
+  m.def("array_qgram_jaccard_1", &array_similarty_function<similarity_measure::Jaccard, QgramTokenizer1>);
+  m.def("array_qgram_jaccard_2", &array_similarty_function<similarity_measure::Jaccard, QgramTokenizer2>);
+  m.def("array_qgram_jaccard_3", &array_similarty_function<similarity_measure::Jaccard, QgramTokenizer3>);
+  m.def("array_qgram_jaccard_4", &array_similarty_function<similarity_measure::Jaccard, QgramTokenizer4>);
+  m.def("array_qgram_jaccard_5", &array_similarty_function<similarity_measure::Jaccard, QgramTokenizer5>);
+  m.def("array_qgram_jaccard_6", &array_similarty_function<similarity_measure::Jaccard, QgramTokenizer6>);
+  m.def("array_qgram_jaccard_7", &array_similarty_function<similarity_measure::Jaccard, QgramTokenizer7>);
+  m.def("array_qgram_jaccard_8", &array_similarty_function<similarity_measure::Jaccard, QgramTokenizer8>);
+  m.def("array_qgram_jaccard_9", &array_similarty_function<similarity_measure::Jaccard, QgramTokenizer9>);
 
-  p::def("array_whitespace_jaccard", array_similarty_function<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>);
-  p::def("array_qgram_jaccard_1", array_similarty_function<similarity_measure::Jaccard, QgramTokenizer1>);
-  p::def("array_qgram_jaccard_2", array_similarty_function<similarity_measure::Jaccard, QgramTokenizer2>);
-  p::def("array_qgram_jaccard_3", array_similarty_function<similarity_measure::Jaccard, QgramTokenizer3>);
-  p::def("array_qgram_jaccard_4", array_similarty_function<similarity_measure::Jaccard, QgramTokenizer4>);
-  p::def("array_qgram_jaccard_5", array_similarty_function<similarity_measure::Jaccard, QgramTokenizer5>);
-  p::def("array_qgram_jaccard_6", array_similarty_function<similarity_measure::Jaccard, QgramTokenizer6>);
-  p::def("array_qgram_jaccard_7", array_similarty_function<similarity_measure::Jaccard, QgramTokenizer7>);
-  p::def("array_qgram_jaccard_8", array_similarty_function<similarity_measure::Jaccard, QgramTokenizer8>);
-  p::def("array_qgram_jaccard_9", array_similarty_function<similarity_measure::Jaccard, QgramTokenizer9>);
+  m.def("array_whitespace_cosine", &array_similarty_function<similarity_measure::Cosine, tokenizer::WhitespaceTokenizer>);
+  m.def("array_qgram_cosine_1", &array_similarty_function<similarity_measure::Cosine, QgramTokenizer1>);
+  m.def("array_qgram_cosine_2", &array_similarty_function<similarity_measure::Cosine, QgramTokenizer2>);
+  m.def("array_qgram_cosine_3", &array_similarty_function<similarity_measure::Cosine, QgramTokenizer3>);
+  m.def("array_qgram_cosine_4", &array_similarty_function<similarity_measure::Cosine, QgramTokenizer4>);
+  m.def("array_qgram_cosine_5", &array_similarty_function<similarity_measure::Cosine, QgramTokenizer5>);
+  m.def("array_qgram_cosine_6", &array_similarty_function<similarity_measure::Cosine, QgramTokenizer6>);
+  m.def("array_qgram_cosine_7", &array_similarty_function<similarity_measure::Cosine, QgramTokenizer7>);
+  m.def("array_qgram_cosine_8", &array_similarty_function<similarity_measure::Cosine, QgramTokenizer8>);
+  m.def("array_qgram_cosine_9", &array_similarty_function<similarity_measure::Cosine, QgramTokenizer9>);
 
-  p::def("array_whitespace_cosine", array_similarty_function<similarity_measure::Cosine, tokenizer::WhitespaceTokenizer>);
-  p::def("array_qgram_cosine_1", array_similarty_function<similarity_measure::Cosine, QgramTokenizer1>);
-  p::def("array_qgram_cosine_2", array_similarty_function<similarity_measure::Cosine, QgramTokenizer2>);
-  p::def("array_qgram_cosine_3", array_similarty_function<similarity_measure::Cosine, QgramTokenizer3>);
-  p::def("array_qgram_cosine_4", array_similarty_function<similarity_measure::Cosine, QgramTokenizer4>);
-  p::def("array_qgram_cosine_5", array_similarty_function<similarity_measure::Cosine, QgramTokenizer5>);
-  p::def("array_qgram_cosine_6", array_similarty_function<similarity_measure::Cosine, QgramTokenizer6>);
-  p::def("array_qgram_cosine_7", array_similarty_function<similarity_measure::Cosine, QgramTokenizer7>);
-  p::def("array_qgram_cosine_8", array_similarty_function<similarity_measure::Cosine, QgramTokenizer8>);
-  p::def("array_qgram_cosine_9", array_similarty_function<similarity_measure::Cosine, QgramTokenizer9>);
+  m.def("whitespace_jaccard", &pair_similarty_function<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>);
+  m.def("qgram_jaccard_1", &pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer1>);
+  m.def("qgram_jaccard_2", &pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer2>);
+  m.def("qgram_jaccard_3", &pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer3>);
+  m.def("qgram_jaccard_4", &pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer4>);
+  m.def("qgram_jaccard_5", &pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer5>);
+  m.def("qgram_jaccard_6", &pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer6>);
+  m.def("qgram_jaccard_7", &pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer7>);
+  m.def("qgram_jaccard_8", &pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer8>);
+  m.def("qgram_jaccard_9", &pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer9>);
 
-  p::def("whitespace_jaccard", pair_similarty_function<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>);
-  p::def("qgram_jaccard_1", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer1>);
-  p::def("qgram_jaccard_2", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer2>);
-  p::def("qgram_jaccard_3", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer3>);
-  p::def("qgram_jaccard_4", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer4>);
-  p::def("qgram_jaccard_5", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer5>);
-  p::def("qgram_jaccard_6", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer6>);
-  p::def("qgram_jaccard_7", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer7>);
-  p::def("qgram_jaccard_8", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer8>);
-  p::def("qgram_jaccard_9", pair_similarty_function<similarity_measure::Jaccard, QgramTokenizer9>);
-
-  p::def("whitespace_cosine", pair_similarty_function<similarity_measure::Cosine, tokenizer::WhitespaceTokenizer>);
-  p::def("qgram_cosine_1", pair_similarty_function<similarity_measure::Cosine, QgramTokenizer1>);
-  p::def("qgram_cosine_2", pair_similarty_function<similarity_measure::Cosine, QgramTokenizer2>);
-  p::def("qgram_cosine_3", pair_similarty_function<similarity_measure::Cosine, QgramTokenizer3>);
-  p::def("qgram_cosine_4", pair_similarty_function<similarity_measure::Cosine, QgramTokenizer4>);
-  p::def("qgram_cosine_5", pair_similarty_function<similarity_measure::Cosine, QgramTokenizer5>);
-  p::def("qgram_cosine_6", pair_similarty_function<similarity_measure::Cosine, QgramTokenizer6>);
-  p::def("qgram_cosine_7", pair_similarty_function<similarity_measure::Cosine, QgramTokenizer7>);
-  p::def("qgram_cosine_8", pair_similarty_function<similarity_measure::Cosine, QgramTokenizer8>);
-  p::def("qgram_cosine_9", pair_similarty_function<similarity_measure::Cosine, QgramTokenizer9>);
+  m.def("whitespace_cosine", &pair_similarty_function<similarity_measure::Cosine, tokenizer::WhitespaceTokenizer>);
+  m.def("qgram_cosine_1", &pair_similarty_function<similarity_measure::Cosine, QgramTokenizer1>);
+  m.def("qgram_cosine_2", &pair_similarty_function<similarity_measure::Cosine, QgramTokenizer2>);
+  m.def("qgram_cosine_3", &pair_similarty_function<similarity_measure::Cosine, QgramTokenizer3>);
+  m.def("qgram_cosine_4", &pair_similarty_function<similarity_measure::Cosine, QgramTokenizer4>);
+  m.def("qgram_cosine_5", &pair_similarty_function<similarity_measure::Cosine, QgramTokenizer5>);
+  m.def("qgram_cosine_6", &pair_similarty_function<similarity_measure::Cosine, QgramTokenizer6>);
+  m.def("qgram_cosine_7", &pair_similarty_function<similarity_measure::Cosine, QgramTokenizer7>);
+  m.def("qgram_cosine_8", &pair_similarty_function<similarity_measure::Cosine, QgramTokenizer8>);
+  m.def("qgram_cosine_9", &pair_similarty_function<similarity_measure::Cosine, QgramTokenizer9>);
 }
